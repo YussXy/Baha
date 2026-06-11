@@ -1,0 +1,23 @@
+{
+  "name": "YussXy Admin",
+  "short_name": "Admin",
+  "description": "Panel Admin YussXy Store",
+  "start_url": "/Baha/admin.html",
+  "scope": "/Baha/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#ef4444",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "image/logo/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "image/logo/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
