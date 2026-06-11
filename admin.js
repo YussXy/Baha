@@ -393,3 +393,140 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+
+const API_BAN = "https://backend-delta-steel-38.vercel.app/api/ban";
+const API_CEKBAN = "https://backend-delta-steel-38.vercel.app/api/cekban";
+
+let mode = "";
+
+function setMode(type) {
+    mode = type;
+
+    deviceBtn.textContent =
+        type === "ban"
+            ? "Ban Device"
+            : type === "unban"
+            ? "Unban Device"
+            : "Cek Device";
+
+    reason.style.display = type === "ban" ? "block" : "none";
+
+    deviceResult.style.display = "none";
+    deviceResult.className = "";
+    deviceResult.innerHTML = "";
+}
+
+deviceBtn.onclick = async () => {
+    const device_id = deviceId.value.trim();
+
+    if (!device_id) {
+        deviceResult.style.display = "block";
+        deviceResult.className = "error";
+        deviceResult.innerHTML = `
+            <i class="ri-error-warning-line"></i>
+            Masukkan Device ID terlebih dahulu
+        `;
+        return;
+    }
+
+    try {
+
+        // ================= BAN =================
+        if (mode === "ban") {
+
+            const res = await fetch(API_BAN, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "ban",
+                    device_id,
+                    reason: reason.value || "no reason"
+                })
+            });
+
+            const data = await res.json();
+
+            deviceResult.style.display = "block";
+            deviceResult.className = "success";
+
+            deviceResult.innerHTML = `
+                <i class="ri-forbid-2-line"></i>
+                <b>Device Berhasil Diblokir</b><br>
+                ${data.message || "OK"}
+            `;
+        }
+
+        // ================= UNBAN =================
+        else if (mode === "unban") {
+
+            const res = await fetch(API_BAN, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "unban",
+                    device_id
+                })
+            });
+
+            const data = await res.json();
+
+            deviceResult.style.display = "block";
+            deviceResult.className = "success";
+
+            deviceResult.innerHTML = `
+                <i class="ri-shield-check-line"></i>
+                <b>Device Berhasil Dibuka</b><br>
+                ${data.message || "OK"}
+            `;
+        }
+
+        // ================= CEK =================
+        else if (mode === "cek") {
+
+            const res = await fetch(
+                `${API_CEKBAN}?device_id=${encodeURIComponent(device_id)}`
+            );
+
+            const data = await res.json();
+
+            deviceResult.style.display = "block";
+
+            if (data.banned) {
+
+                const info = data.data?.[0];
+
+                deviceResult.className = "error";
+
+                deviceResult.innerHTML = `
+                    <i class="ri-forbid-2-line"></i>
+                    <b>Device Diblokir</b><br>
+                    ID: ${device_id}<br>
+                    Alasan: ${info?.reason || "-"}<br>
+                    Waktu: ${info?.created_at || "-"}
+                `;
+
+            } else {
+
+                deviceResult.className = "success";
+
+                deviceResult.innerHTML = `
+                    <i class="ri-checkbox-circle-line"></i>
+                    <b>Device Tidak Diblokir</b><br>
+                    ID: ${device_id}
+                `;
+            }
+        }
+
+    } catch (err) {
+
+        deviceResult.style.display = "block";
+        deviceResult.className = "error";
+
+        deviceResult.innerHTML = `
+            <i class="ri-error-warning-line"></i>
+            Gagal konek ke server
+        `;
+    }
+};
