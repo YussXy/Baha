@@ -1,9 +1,11 @@
-var CACHE_NAME = 'yussxy-admin-v1';
+var CACHE_NAME = 'yussxy-store-v1';
 var urlsToCache = [
-  '/admin.html',
-  '/admin.css',
-  '/admin.js',
-  '/image/logo/logo.jpg',
+  '/Baha/',
+  '/Baha/index.html',
+  '/Baha/style.css',
+  '/Baha/script.js',
+  '/Baha/manifest.json',
+  '/Baha/image/logo/logo.jpg',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
   'https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css'
 ];
