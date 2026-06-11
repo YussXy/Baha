@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -52,6 +51,18 @@
                 <div id="loginError" class="error-msg" style="display: none;"></div>
             </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
             <!-- DASHBOARD -->
             <div id="dashboardContainer" style="display: none;">
                 <div class="page-header">
@@ -92,6 +103,66 @@
                     <div id="storeActionMessage" class="store-action-message" style="display: none;"></div>
                 </div>
 
+
+
+
+
+<div class="info-card">
+    <h3><i class="ri-forbid-line"></i> Device Manager</h3>
+
+    <div class="ban-grid">
+
+        <div class="ban-card" onclick="setMode('ban')">
+            <i class="ri-forbid-2-line"></i>
+            <span>Ban</span>
+        </div>
+
+        <div class="ban-card" onclick="setMode('unban')">
+            <i class="ri-shield-check-line"></i>
+            <span>Unban</span>
+        </div>
+
+        <div class="ban-card" onclick="setMode('cek')">
+            <i class="ri-search-line"></i>
+            <span>Cek</span>
+        </div>
+
+    </div>
+
+    <div style="margin-top:20px">
+        <input
+            type="text"
+            id="deviceId"
+            class="admin-input"
+            placeholder="Masukkan Device ID">
+
+        <input
+            type="text"
+            id="reason"
+            class="admin-input"
+            placeholder="Alasan ban"
+            style="margin-top:12px">
+
+        <button
+            id="deviceBtn"
+            class="login-btn"
+            style="margin-top:15px">
+            Pilih Menu Di Atas
+        </button>
+
+
+<div id="deviceResult"></div>
+
+
+    </div>
+    
+    
+
+</div>
+
+
+
+
                 <!-- Card Statistik Toko -->
                 <div class="info-card">
                     <h3><i class="ri-store-3-line"></i> Statistik Toko</h3>
@@ -126,6 +197,14 @@
                     </div>
                 </div>
 
+
+
+
+
+
+
+
+
                 <button id="logoutBtn" class="logout-btn">
                     <i class="ri-logout-box-line"></i> Keluar Panel
                 </button>
@@ -141,7 +220,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/Baha/sw-admin.js').then(function(registration) {
+                navigator.serviceWorker.register('/sw-admin.js').then(function(registration) {
                     console.log('✅ Admin Service Worker registered:', registration.scope);
                 }).catch(function(err) {
                     console.log('❌ Admin Service Worker failed:', err);
