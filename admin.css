@@ -1,3 +1,243 @@
+
+
+
+
+/* =================================
+   DEVICE RESULT
+================================= */
+
+#deviceResult{
+    margin-top:16px;
+}
+
+.result-box{
+    background:var(--bg-secondary);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px;
+    animation:fadeIn .3s ease;
+}
+
+.result-box.success{
+    background:rgba(16,185,129,.08);
+    border-color:rgba(16,185,129,.4);
+}
+
+.result-box.error{
+    background:rgba(239,68,68,.08);
+    border-color:rgba(239,68,68,.4);
+}
+
+.result-box.info{
+    background:rgba(59,130,246,.08);
+    border-color:rgba(59,130,246,.4);
+}
+
+.result-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:14px;
+}
+
+.result-title i{
+    font-size:22px;
+}
+
+.result-box.success .result-title{
+    color:#10b981;
+}
+
+.result-box.error .result-title{
+    color:#ef4444;
+}
+
+.result-box.info .result-title{
+    color:#3b82f6;
+}
+
+.result-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:10px 0;
+    border-top:1px solid rgba(255,255,255,.05);
+}
+
+.result-item:first-child{
+    border-top:none;
+    padding-top:0;
+}
+
+.result-label{
+    color:var(--text-secondary);
+    font-size:13px;
+}
+
+.result-value{
+    color:var(--text-primary);
+    font-size:13px;
+    font-weight:600;
+    text-align:right;
+    word-break:break-all;
+}
+
+@media (max-width:480px){
+
+    .result-item{
+        flex-direction:column;
+        gap:4px;
+    }
+
+    .result-value{
+        text-align:left;
+    }
+
+}
+
+
+
+
+/* ===== MENU BAN DEVICE ===== */
+.ban-grid{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.ban-card{
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.ban-card:hover{
+    border-color: rgba(239,68,68,.5);
+    transform: translateY(-2px);
+}
+
+.ban-card:active{
+    transform: scale(.96);
+}
+
+.ban-card i{
+    font-size: 28px;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.ban-card span{
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+/* HP kecil */
+@media(max-width:380px){
+
+    .ban-grid{
+        gap:10px;
+    }
+
+    .ban-card{
+        padding:16px 8px;
+    }
+
+    .ban-card i{
+        font-size:24px;
+    }
+
+    .ban-card span{
+        font-size:11px;
+    }
+
+}
+
+/* ===============================
+   HASIL API DEVICE MANAGER
+   =============================== */
+
+#deviceResult{
+    margin-top: 16px;
+}
+
+.result-box{
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    animation: fadeIn .25s ease;
+}
+
+.result-box.success{
+    border-color: rgba(16,185,129,.5);
+    background: rgba(16,185,129,.08);
+}
+
+.result-box.error{
+    border-color: rgba(239,68,68,.5);
+    background: rgba(239,68,68,.08);
+}
+
+.result-box.info{
+    border-color: rgba(59,130,246,.5);
+    background: rgba(59,130,246,.08);
+}
+
+.result-title{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.result-title i{
+    font-size: 18px;
+}
+
+.result-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255,255,255,.05);
+}
+
+.result-item:first-child{
+    border-top: none;
+}
+
+.result-label{
+    color: var(--text-secondary);
+}
+
+.result-value{
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+
+
+
+
 /* ================================================
    STYLE ADMIN - YUSSXY STORE (dengan animasi keren)
    ================================================ */
@@ -143,6 +383,7 @@ body {
 
 /* ========== MAIN CONTENT ========== */
 .main-content {
+    
     padding: 20px 16px;
     min-height: calc(100vh - 130px);
 }
@@ -592,3 +833,50 @@ small {
     font-size: 11px;
     margin-top: 4px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+#deviceResult{
+    display:none;
+    margin-top:15px;
+    padding:15px;
+    border-radius:16px;
+    border:1px solid var(--border);
+    background:var(--bg-secondary);
+    font-size:13px;
+    line-height:1.7;
+    word-break:break-word;
+}
+
+#deviceResult.success{
+    background:rgba(16,185,129,.1);
+    border-color:#10b981;
+    color:#10b981;
+}
+
+#deviceResult.error{
+    background:rgba(239,68,68,.1);
+    border-color:#ef4444;
+    color:#ef4444;
+}
+
+#deviceResult i{
+    font-size:18px;
+    margin-right:5px;
+}
+
+#deviceResult b{
+    font-size:14px;
+}
+
+
