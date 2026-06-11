@@ -1,9 +1,8 @@
-
 {
-  "name": "YussXy Admin",
-  "short_name": "Admin",
-  "description": "Panel Admin YussXy Store",
-  "start_url": "/Baha/admin.html",
+  "name": "YussXy Store",
+  "short_name": "YussXy",
+  "description": "Toko Digital YussXy",
+  "start_url": "/Baha/",
   "scope": "/Baha/",
   "display": "standalone",
   "background_color": "#0f0f0f",
