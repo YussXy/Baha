@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -140,7 +141,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw-admin.js').then(function(registration) {
+                navigator.serviceWorker.register('/Baha/sw-admin.js').then(function(registration) {
                     console.log('✅ Admin Service Worker registered:', registration.scope);
                 }).catch(function(err) {
                     console.log('❌ Admin Service Worker failed:', err);
