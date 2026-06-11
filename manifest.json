@@ -1,9 +1,10 @@
+
 {
-  "name": "YussXy Store Admin",
-  "short_name": "Admin YussXy",
+  "name": "YussXy Admin",
+  "short_name": "Admin",
   "description": "Panel Admin YussXy Store",
-  "start_url": "/admin.html",
-  "scope": "/",
+  "start_url": "/Baha/admin.html",
+  "scope": "/Baha/",
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#ef4444",
