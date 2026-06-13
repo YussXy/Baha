@@ -537,57 +537,99 @@ deviceBtn.onclick = async () => {
 //💦💦💦💦💦💦💦💦
 
 
-
-
-
-
-
-
-
-
 const API_BALANCE = "https://backend-delta-steel-38.vercel.app/api/balance";
 
 async function balanceAction(action) {
-    const device_id = document.getElementById("balanceDeviceId").value.trim();
+    const identifier = document.getElementById("balanceDeviceId").value.trim();
     const amount = parseInt(document.getElementById("balanceAmount").value);
-
     const resultBox = document.getElementById("balanceResult");
 
-    if (!device_id) {
-        resultBox.innerHTML = "❌ Device ID kosong";
+    if (!identifier) {
+        resultBox.innerHTML = "❌ Masukkan Device ID atau Nomor HP";
         return;
     }
 
-    try {
-        // ================= CEK SALDO =================
-        if (action === "get") {
+    resultBox.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Memproses...';
 
+    try {
+        let device_id = null;
+        let username = null;
+        let phone = null;
+
+        // Cek apakah identifier adalah device_id (16 karakter hex)
+        const isDeviceId = /^[A-F0-9]{16}$/.test(identifier.toUpperCase());
+
+        if (isDeviceId) {
+            device_id = identifier.toUpperCase();
             const res = await fetch(API_BALANCE, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "x-api-key": "sb_secret_Ok9VVXILGV6zybDzN0zVpA_U5k___GF"
                 },
-                body: JSON.stringify({
-                    action: "get",
-                    device_id
-                })
+                body: JSON.stringify({ action: "get", device_id: device_id })
             });
-
             const data = await res.json();
+            if (data.success && data.data) {
+                username = data.data.username || null;
+                phone = data.data.phone || null;
+            } else {
+                resultBox.innerHTML = `❌ Device ID tidak ditemukan: ${identifier}`;
+                return;
+            }
+        } else {
+            // Cari berdasarkan username atau nomor HP
+            const searchRes = await fetch(API_BALANCE, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "sb_secret_Ok9VVXILGV6zybDzN0zVpA_U5k___GF"
+                },
+                body: JSON.stringify({ action: "search_user", query: identifier })
+            });
+            const searchData = await searchRes.json();
+            if (searchData.success && searchData.data) {
+                device_id = searchData.data.device_id;
+                username = searchData.data.username;
+                phone = searchData.data.phone;
+            } else {
+                resultBox.innerHTML = `❌ User tidak ditemukan: ${identifier}`;
+                return;
+            }
+        }
 
+        if (!device_id) {
+            resultBox.innerHTML = `❌ User ${username || phone || identifier} tidak memiliki device_id`;
+            return;
+        }
+
+        // CEK SALDO
+        if (action === "get") {
+            const res = await fetch(API_BALANCE, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "sb_secret_Ok9VVXILGV6zybDzN0zVpA_U5k___GF"
+                },
+                body: JSON.stringify({ action: "get", device_id: device_id })
+            });
+            const data = await res.json();
             if (data.success) {
                 resultBox.innerHTML = `
-                    <b>Saldo:</b> Rp ${data.data.balance.toLocaleString("id-ID")}
+                    <div style="background: rgba(16,185,129,0.1); padding: 12px; border-radius: 12px;">
+                        <b>👤 User:</b> ${username || phone || '-'}<br>
+                        <b>📞 Nomor:</b> ${phone || '-'}<br>
+                        <b>📱 Device ID:</b> ${device_id}<br>
+                        <b>💰 Saldo:</b> <span style="color: #10b981; font-size: 16px;">Rp ${data.data.balance.toLocaleString("id-ID")}</span>
+                    </div>
                 `;
             } else {
                 resultBox.innerHTML = `❌ ${data.message}`;
             }
-
             return;
         }
 
-        // ================= ADD / SUB =================
+        // ADD / SUB
         if (!amount || amount <= 0) {
             resultBox.innerHTML = "❌ Amount tidak valid";
             return;
@@ -599,26 +641,212 @@ async function balanceAction(action) {
                 "Content-Type": "application/json",
                 "x-api-key": "sb_secret_Ok9VVXILGV6zybDzN0zVpA_U5k___GF"
             },
-            body: JSON.stringify({
-                action,
-                device_id,
-                amount
-            })
+            body: JSON.stringify({ action: action, device_id: device_id, amount: amount })
         });
 
         const data = await res.json();
 
         if (data.success) {
+            const actionText = action === "add" ? "Ditambahkan" : "Dikurangi";
+            const actionColor = action === "add" ? "#10b981" : "#f59e0b";
             resultBox.innerHTML = `
-                ✅ Berhasil<br>
-                Device: ${device_id}<br>
-                Balance: Rp ${data.data.balance.toLocaleString("id-ID")}
+                <div style="background: rgba(16,185,129,0.1); padding: 12px; border-radius: 12px;">
+                    <b>✅ ${actionText}</b><br>
+                    👤 User: ${username || phone || '-'}<br>
+                    📞 Nomor: ${phone || '-'}<br>
+                    📱 Device: ${device_id}<br>
+                    💰 Jumlah: <span style="color: ${actionColor};">Rp ${amount.toLocaleString("id-ID")}</span><br>
+                    💵 Sisa Saldo: <span style="color: #10b981; font-size: 15px;">Rp ${data.data.balance.toLocaleString("id-ID")}</span>
+                </div>
             `;
         } else {
             resultBox.innerHTML = `❌ ${data.message}`;
         }
 
     } catch (err) {
+        console.error("Error:", err);
         resultBox.innerHTML = "❌ Server error";
     }
 }
+
+
+
+
+
+// ================================================
+// CEK ID TRANSAKSI - SCAN SEMUA DEVICE
+// ================================================
+
+async function searchTransactionById() {
+    const transactionId = document.getElementById("searchTransactionId").value.trim();
+    const resultDiv = document.getElementById("transactionResult");
+    
+    if (!transactionId) {
+        resultDiv.style.display = "block";
+        resultDiv.className = "transaction-result notfound";
+        resultDiv.innerHTML = '<i class="ri-error-warning-line"></i> Masukkan ID Transaksi terlebih dahulu';
+        return;
+    }
+    
+    resultDiv.style.display = "block";
+    resultDiv.className = "transaction-result";
+    resultDiv.innerHTML = '<div class="history-loading" style="padding: 20px;"><i class="ri-loader-4-line animate-spin"></i> Mencari transaksi di semua device...</div>';
+    
+    try {
+        // Ambil semua user dari database
+        const allUsersRes = await fetch("https://backend-delta-steel-38.vercel.app/api/balance", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "sb_secret_Ok9VVXILGV6zybDzN0zVpA_U5k___GF"
+            },
+            body: JSON.stringify({ action: "get_all_users" })
+        });
+        
+        const allUsersData = await allUsersRes.json();
+        
+        if (!allUsersData.success || !allUsersData.users) {
+            resultDiv.className = "transaction-result notfound";
+            resultDiv.innerHTML = '<i class="ri-error-warning-line"></i> Gagal mengambil data user';
+            return;
+        }
+        
+        let foundTransaction = null;
+        let foundDeviceId = null;
+        let foundUser = null;
+        
+        // Loop ke semua user
+        for (const user of allUsersData.users) {
+            if (user.trx_id && Array.isArray(user.trx_id)) {
+                const found = user.trx_id.find(t => t.id === transactionId);
+                if (found) {
+                    foundTransaction = found;
+                    foundDeviceId = user.device_id;
+                    foundUser = user;
+                    break;
+                }
+            }
+        }
+        
+        if (foundTransaction) {
+            const t = foundTransaction;
+            const date = new Date(t.created_at);
+            const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            const formattedTime = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            let statusClass = "success";
+            let statusText = "✅ Sukses";
+            if (t.status === "pending") {
+                statusClass = "pending";
+                statusText = "⏳ Pending";
+            } else if (t.status === "failed") {
+                statusClass = "failed";
+                statusText = "❌ Gagal";
+            }
+            
+            let typeIcon = "ri-shopping-bag-line";
+            let typeName = "Produk";
+            switch(t.type) {
+                case 'apk': typeIcon = "ri-android-line"; typeName = "APK"; break;
+                case 'design': typeIcon = "ri-palette-line"; typeName = "Design"; break;
+                case 'reaction': typeIcon = "ri-emotion-line"; typeName = "Reaction"; break;
+                case 'deposit': typeIcon = "ri-wallet-line"; typeName = "Deposit"; break;
+                case 'transfer': typeIcon = "ri-bank-card-line"; typeName = "Transfer"; break;
+                default: typeIcon = "ri-shopping-bag-line"; typeName = "Produk";
+            }
+            
+            resultDiv.className = "transaction-result found";
+            resultDiv.innerHTML = `
+                <div class="transaction-header">
+                    <i class="${typeIcon}"></i>
+                    <div style="flex:1;">
+                        <h4>${escapeHtml(t.product_name || "Produk Digital")}</h4>
+                        <span style="font-size: 11px; color: var(--text-secondary);">${typeName} • ${t.type || '-'}</span>
+                    </div>
+                    <span class="history-status status-${statusClass}" style="font-size: 11px;">${statusText}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-qr-code-line"></i> ID Transaksi</span>
+                    <span class="transaction-value" style="font-family: monospace;">${escapeHtml(t.id)}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-user-line"></i> Username</span>
+                    <span class="transaction-value">${escapeHtml(foundUser?.username || '-')}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-phone-line"></i> Nomor HP</span>
+                    <span class="transaction-value">${escapeHtml(foundUser?.phone || '-')}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-device-line"></i> Device ID</span>
+                    <span class="transaction-value" style="font-family: monospace; font-size: 11px;">${escapeHtml(foundDeviceId || '-')}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-money-dollar-circle-line"></i> Jumlah</span>
+                    <span class="transaction-value" style="color: #10b981;">Rp ${(t.amount || 0).toLocaleString('id-ID')}</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-calendar-line"></i> Tanggal</span>
+                    <span class="transaction-value">${formattedDate} ${formattedTime}</span>
+                </div>
+                ${t.phone ? `
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-whatsapp-line"></i> Dikirim ke</span>
+                    <span class="transaction-value">+${escapeHtml(t.phone)}</span>
+                </div>
+                ` : ''}
+                ${t.target_link ? `
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-link"></i> Target Link</span>
+                    <span class="transaction-value" style="word-break: break-all;">${escapeHtml(t.target_link.substring(0, 50))}${t.target_link.length > 50 ? '...' : ''}</span>
+                </div>
+                ` : ''}
+                ${t.emoji ? `
+                <div class="transaction-detail">
+                    <span class="transaction-label"><i class="ri-emotion-line"></i> Emoji</span>
+                    <span class="transaction-value">${escapeHtml(t.emoji)}</span>
+                </div>
+                ` : ''}
+            `;
+        } else {
+            resultDiv.className = "transaction-result notfound";
+            resultDiv.innerHTML = `
+                <i class="ri-error-warning-line"></i> 
+                Transaksi dengan ID <strong>${escapeHtml(transactionId)}</strong> tidak ditemukan
+                <br><small style="display: block; margin-top: 8px;">Pastikan ID Transaksi benar</small>
+            `;
+        }
+    } catch (error) {
+        console.error("Error searching transaction:", error);
+        resultDiv.className = "transaction-result notfound";
+        resultDiv.innerHTML = '<i class="ri-error-warning-line"></i> Gagal mencari transaksi. Coba lagi nanti.';
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Event listener untuk tombol cari transaksi
+const searchBtn = document.getElementById('searchTransactionBtn');
+if (searchBtn) {
+    const newSearchBtn = searchBtn.cloneNode(true);
+    searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+    newSearchBtn.addEventListener('click', searchTransactionById);
+}
+
+// Enter key support
+const searchInput = document.getElementById('searchTransactionId');
+if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchTransactionById();
+        }
+    });
+            }
