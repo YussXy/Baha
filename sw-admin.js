@@ -1,23 +1,26 @@
 var CACHE_NAME = 'yussxy-admin-v1';
 var urlsToCache = [
-  '/Baha/admin.html',
-  '/Baha/admin.css',
-  '/Baha/admin.js',
-  '/Baha/image/logo/logo.jpg',
+  '/index.html',
+  '/admin.css',
+  '/admin.js',
+  '/image/logo/logo.jpg',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
   'https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css'
 ];
 
 self.addEventListener('install', function(event) {
-  event.waitUntil(caches.open(CACHE_NAME).then(function(cache) {
-    return cache.addAll(urlsToCache);
-  }));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(urlsToCache);
+    })
+  );
 });
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
+      if (response) return response;
+      return fetch(event.request);
     })
   );
 });
@@ -27,7 +30,9 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) return caches.delete(cacheName);
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
         })
       );
     })
